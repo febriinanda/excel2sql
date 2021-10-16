@@ -25,39 +25,50 @@ def reverse(data, def_value):
     return datetime.strptime(data, '%d%m%Y').strftime('%d-%b-%y')
 
 
-print("Number of arguments:", len(sys.argv))
-print("Args list:", str(sys.argv))
-
-tz = []
-tz_def = 0
-
-tz_rev = []
-tz_rev_def = 0
+table_name = "TABLE_NAME"
+excel_name = "Sample1.xlsx"
+mode = "insert"
+pk_index = 1
+pk_name = None
+limitation = 0
 
 nn = []
 nn_def = 0
 
+tz = []
+tz_def = 0
+
 exc = []
+for i in range(len(sys.argv)):
+    args = sys.argv[i]
+    print("arg:"+str(i)+", value:"+args)
 
-table_name = sys.argv[1]
-excel_name = sys.argv[2]
-limitation = int(sys.argv[3])
-advanced = sys.argv[4]
-rules = advanced.split(";")
+    if "=" in args:
+        arg = args.split("=")
+        if len(arg) > 0:
+            arg_key = arg[0]
+            arg_val = arg[1]
+            if arg_key == "--table":
+                table_name = arg_val
+            elif arg_key == "--file":
+                excel_name = arg_val
+            elif arg_key == "--mode":
+                mode = arg_val.lower()
+            elif arg_key == "--pk":
+                pk_name = arg_val
+            elif arg_key == "--limit":
+                limitation = int(arg_val)
+            elif arg_key == "--nn":
+                nn = arg_val.split(",")
+            elif arg_key == "--nn_value":
+                nn_def = arg_val
+            elif arg_key == "--tz":
+                tz = arg_val.split(",")
+            elif arg_key == "--tz_value":
+                tz_def = arg_val
+            elif arg_key == "--exc":
+                exc = arg_val.split(",")
 
-for i in rules:
-    rule = i.split(":")
-    if rule[0] == "NN":
-        nn_def = rule[1]
-        nn = rule[2].split(",")
-    elif rule[0] == "TZ":
-        tz_def = rule[1]
-        tz = rule[2].split(",")
-    elif rule[0] == "TZ-":
-        tz_rev_def = rule[1]
-        tz_rev = rule[2].split(",")
-    else:
-        exc = rule[2].split(",")
 
 excelData = pd.read_excel(os.getcwd() + "\\" + excel_name, "Sheet1", dtype=object)
 headers = list(excelData)
@@ -69,7 +80,7 @@ if not path.exists(generated_path):
 
 timestamp_now = time.time()
 ex_name = excel_name.split(".")
-file_name = ex_name[0] + "_insert_" + str(int(round(timestamp_now)))
+file_name = ex_name[0] + "_"+mode+"_" + str(int(round(timestamp_now)))
 f = open(generated_path + file_name + ".sql", "w+")
 
 copied = excelData.copy()
@@ -102,8 +113,8 @@ for i in range(len(excelData)):
             else:
                 if y in tz:
                     val = convert(tz_checking(val))
-                elif y in tz_rev:
-                    val = reverse(val, tz_rev_def)
+                # elif y in tz_rev:
+                #     val = reverse(val, tz_rev_def)
 
             if "\'" in val:
                 val = val.replace("\'", "\'\'")
