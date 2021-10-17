@@ -1,28 +1,10 @@
-from datetime import datetime
 from os import path, mkdir
 import sys
 import pandas as pd
 import os
 import time
 
-
-def tz_checking(data):
-    if int(data) == 0:
-        return tz_def
-    else:
-        return data
-
-
-def convert(data):
-    return datetime.strptime(data, '%Y%m%d').strftime('%d-%b-%y')
-
-
-def reverse(data, def_value):
-    if int(data) == 0:
-        return def_value
-
-    data.zfill(8)
-    return datetime.strptime(data, '%d%m%Y').strftime('%d-%b-%y')
+import utility
 
 
 table_name = "TABLE_NAME"
@@ -36,7 +18,6 @@ nn = []
 nn_def = 0
 
 tz = []
-tz_def = 0
 
 exc = []
 for i in range(len(sys.argv)):
@@ -65,7 +46,7 @@ for i in range(len(sys.argv)):
             elif arg_key == "--tz":
                 tz = arg_val.split(",")
             elif arg_key == "--tz_value":
-                tz_def = arg_val
+                utility.tz_def = arg_val
             elif arg_key == "--exc":
                 exc = arg_val.split(",")
 
@@ -96,7 +77,8 @@ for i in range(len(excelData)):
         part = part + 1
         limit = limitation * part
         f.close()
-        print("**Open for part:" + str(part))
+
+        print("**Open for part: {0}".format(str(part)))
         f = open(generated_path + file_name + "_" + str(part) + ".sql", "w+")
 
     line_headers = headers.copy()
@@ -118,7 +100,7 @@ for i in range(len(excelData)):
                     continue
             else:
                 if y in tz:
-                    val = convert(tz_checking(val))
+                    val = utility.convert(utility.tz_checking(val))
                 # elif y in tz_rev:
                 #     val = reverse(val, tz_rev_def)
 
@@ -131,20 +113,19 @@ for i in range(len(excelData)):
                 if y == pk_name:
                     pk_value = val
                 else:
-                    update_set = y + "='" + str(val) + "'"
+                    update_set = "{0}='{1}'".format(y, str(val))
                     col_list.append(update_set)
         except ValueError:
-            print("Error - Row:" + str(i) + ", Field:" + y + ", Value:" + str(val))
+            print("Error - Row: {0}, Field: {1}, Value: {2}".format(str(i), y, str(val)))
             continue
 
     counter = counter + 1
+    counter_txt = "-- Query {1} No #{0} \n".format(str(counter), mode)
 
     if mode == "insert":
-        counter_txt = "-- Query insert No #" + str(counter) + "\n"
         sql_txt = "INSERT INTO {0}({1}) VALUES(\'{2}\'); \n".format(table_name, ",".join(line_headers),
                                                                     "','".join(col_list))
     else:
-        counter_txt = "-- Query update No #" + str(counter) + "\n"
         sql_txt = "UPDATE {0} SET {1} WHERE {2}='{3}'; \n".format(table_name, ",".join(col_list),
                                                                   pk_name, pk_value)
 
