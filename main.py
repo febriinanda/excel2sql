@@ -1,9 +1,10 @@
-from datetime import datetime
 from os import path, mkdir
 import sys
 import pandas as pd
 import os
 import time
+
+import utility
 
 
 def tz_checking(data):
@@ -11,18 +12,6 @@ def tz_checking(data):
         return tz_def
     else:
         return data
-
-
-def convert(data):
-    return datetime.strptime(data, '%Y%m%d').strftime('%d-%b-%y')
-
-
-def reverse(data, def_value):
-    if int(data) == 0:
-        return def_value
-
-    data.zfill(8)
-    return datetime.strptime(data, '%d%m%Y').strftime('%d-%b-%y')
 
 
 table_name = "TABLE_NAME"
@@ -118,7 +107,7 @@ for i in range(len(excelData)):
                     continue
             else:
                 if y in tz:
-                    val = convert(tz_checking(val))
+                    val = utility.convert(tz_checking(val))
                 # elif y in tz_rev:
                 #     val = reverse(val, tz_rev_def)
 
