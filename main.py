@@ -102,6 +102,7 @@ for i in range(len(excelData)):
     line_headers = headers.copy()
     col_list = []
     pk_value = None
+    val = None
     for y in headers:
         try:
             if y in exc:
