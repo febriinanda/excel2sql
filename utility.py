@@ -18,5 +18,11 @@ def reverse(data, def_value):
 def tz_checking(data):
     if int(data) == 0:
         return tz_def
+    elif "0229" in data:
+        try:
+            datetime.strptime(data, '%Y%m%d').strftime('%d-%b-%y')
+            return data
+        except ValueError:
+            return str(data).replace("0229", "0228")
     else:
         return data
