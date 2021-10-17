@@ -1,0 +1,22 @@
+## preferred command
+python main.py
+    --table=table-name
+    --file=file.xlsx
+    --mode=[insert/update]
+    --pk=FIELD_NAME
+    --limit=[0..99999]
+    --nn=FIELD_NAME,FIELD_NAME2,dst
+    --nn_value=[nn_value]
+    --tz=FIELD_NAME,FIELD_NAME2,dst
+    --tz_value=[tz_value]
+    --exc=FIELD_NAME,FIELD_NAME2,dst
+
+ket:
+--mode : opsi yang tersedia 'insert' dan 'update'
+--pk : definisi table yang menjadi primary key, digunakan untuk <mode:update>. Jika nilai tidak tersedia, maka kolom pertama pada excel akan dianggap sebagai primary key
+--limit : set nilai batasan per 1 file output. Jika diisi 0, maka tidak ada batasan yang akan digunakan
+--nn : definisi field yang tidak boleh kosong, jika kosong akan diisi dari value <--nn_value>
+--nn_value : nilai awal untuk arg <--nn>
+--tz : definisi field yang akan diconvert ke dalam bentuk timestamp
+--tz_value : nilai awal untuk arg <--tz>
+--exc : definisi field yang tidak dimasukkan kedalam hasil
